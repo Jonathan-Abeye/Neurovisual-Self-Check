@@ -2271,7 +2271,18 @@ function showResultScreen() {
 /* ═══════════════════════════════════════════════════
    GÉOLOCALISATION IP
 ═══════════════════════════════════════════════════ */
-// Géolocalisation gérée côté Apps Script (via l'IP de la requête)
+// Récupère l'IP publique côté navigateur, la géolocalisation est faite par Apps Script
+let _ipCache = null;
+async function getPublicIP() {
+  if (_ipCache) return _ipCache;
+  try {
+    const d = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+    _ipCache = d.ip || 'N/A';
+  } catch(e) {
+    _ipCache = 'N/A';
+  }
+  return _ipCache;
+}
 
 /* ═══════════════════════════════════════════════════
    ENVOI GOOGLE SHEETS
@@ -2310,10 +2321,12 @@ async function submitForm() {
   btn.disabled = true;
   btn.classList.add('sending');
 
+  const ip = await getPublicIP();
   const payload = {
     prenom,
     email,
     crowding:  state.hasCrowding ? 'oui' : 'non',
+    ip,
     timestamp: new Date().toISOString()
   };
 
