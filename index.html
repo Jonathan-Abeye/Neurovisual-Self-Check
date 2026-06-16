@@ -823,6 +823,12 @@
     align-items: center;
   }
   .result-actions .btn { width: 100%; justify-content: center; }
+  #resultActions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: clamp(8px, 1.5vh, 16px);
+    display: none;
+  }
   .result-subtext {
     color: var(--ink-soft);
     font-size: clamp(13px, 1.3vw, 15px);
@@ -878,8 +884,7 @@
   }
 
   /* Colonne œil (simple ou multi) */
-  .sit-eye-col,
-  .sit-eye-col--multi {
+  .sit-eye-col, .sit-eye-col--multi {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1264,8 +1269,8 @@
       <div class="result-card anim-in" style="max-width:960px; padding: clamp(14px,2vh,24px) clamp(16px,2.5vw,32px);">
         <img class="result-logo" id="questionLogo" alt="Lexilens">
         <div class="eyebrow" id="questionEyebrowEl"></div>
-        <h2 class="result-title" id="questionTitleEl" style="margin-bottom:6px;"></h2>
-        <p class="result-subtext" id="questionSubEl" style="margin-bottom:20px;"></p>
+        <h2 class="result-title" id="questionTitleEl"></h2>
+        <p class="result-subtext" id="questionSubEl"></p>
 
         <!-- Situation cards — empilées verticalement -->
         <div class="situation-stack">
@@ -1351,7 +1356,7 @@
         </div>
 
         <!-- Boutons navigation (après envoi) -->
-        <div class="result-actions" id="resultActions" style="flex-direction:column; gap:8px; margin-top:clamp(8px,1.5vh,16px); display:none;">
+        <div class="result-actions" id="resultActions">
           <button class="btn btn-primary" id="btnDiscover" onclick="window.open('https://lexilens.com','_blank')">Découvrir Lexilens</button>
           <button class="btn btn-ghost" id="btnTestOtherEyeResult" onclick="restartForOtherEye()">Recommencer le test</button>
           <button class="btn btn-ghost" id="btnFinishResult" onclick="goTo('welcome')">Retour à l'accueil</button>
@@ -1458,7 +1463,6 @@ const I18N = {
     testFixate: "Fixate the « b »",
     btnEndTest: "End test",
     endTestHint: "Press when you've completed the hand alternation sequence",
-
 
     questionEyebrow: "Your result",
     questionTitle: "What did you observe?",
