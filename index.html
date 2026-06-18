@@ -224,13 +224,44 @@
     overflow: hidden;
     box-sizing: border-box;
   }
-  /* Screens with scrollable cards (question + result) */
-  #screen-result .container,
-  #screen-question .container {
+  /* Result screen : scrollable */
+  #screen-result .container {
     overflow-y: auto;
     justify-content: flex-start;
     padding-top: max(2vh, 12px);
     padding-bottom: max(2vh, 16px);
+  }
+
+  /* Question screen : no scroll, tout proportionnel */
+  #screen-question {
+    overflow: hidden;
+  }
+  #screen-question .container {
+    overflow: hidden;
+    justify-content: center;
+    padding-top: max(1vh, 8px);
+    padding-bottom: max(1vh, 8px);
+    gap: clamp(4px, 0.8vh, 10px);
+  }
+  #screen-question .result-card {
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.6vh, 8px);
+  }
+  #screen-question .result-title {
+    font-size: clamp(14px, 2vw, 22px);
+    margin-bottom: 0;
+  }
+  #screen-question .result-subtext {
+    font-size: clamp(11px, 1vw, 14px);
+    margin-bottom: 0;
+  }
+  #screen-question .result-logo {
+    height: clamp(28px, 4vh, 44px);
+    margin-bottom: 0;
   }
 
   /* ═══════════ TYPOGRAPHY ═══════════ */
@@ -841,15 +872,17 @@
   .situation-stack {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: clamp(6px, 1vh, 14px);
     width: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
   .situation-card {
     background: var(--bg-white);
     border: 2.5px solid var(--brand-blue-soft);
     border-radius: 20px;
-    padding: 14px 16px 16px;
+    padding: clamp(8px,1.2vh,14px) clamp(10px,1.5vw,20px);
     cursor: pointer;
     transition: all 250ms var(--ease-spring);
     box-shadow: var(--shadow-sm);
@@ -857,7 +890,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: clamp(6px,0.8vh,10px);
     width: 100%;
     box-sizing: border-box;
   }
@@ -870,17 +903,39 @@
 
   .situation-label {
     font-weight: 800;
-    font-size: clamp(15px, 1.8vw, 20px);
+    font-size: clamp(12px, 1.4vw, 17px);
     color: var(--brand-blue);
   }
 
-  /* Ligne principale : gauche | droit */
+  /* Ligne principale : gauche | centre | droit */
   .sit-row {
     display: flex;
     align-items: flex-start;
     gap: clamp(16px, 3vw, 40px);
     justify-content: center;
     width: 100%;
+  }
+
+  /* Variante 3 colonnes (avec fille au centre) — CSS Grid pour alignement parfait */
+  .sit-row--three {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: clamp(10px, 2vw, 28px);
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  /* Fille : centrée verticalement */
+  .sit-row--three .sit-girl-col {
+    align-self: center;
+    justify-self: center;
+  }
+
+  /* Colonnes œil : centrées dans leur cellule grid */
+  .sit-row--three .sit-eye-col,
+  .sit-row--three .sit-eye-col--multi,
+  .sit-row--three .sit-eye-col--right-b {
+    justify-self: center;
   }
 
   /* Colonne œil (simple ou multi) */
@@ -892,8 +947,38 @@
     flex: 0 0 auto;
   }
 
+  /* Colonne fille centrale */
+  .sit-girl-col {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sit-girl-img {
+    height: clamp(60px, 12vw, 120px);
+    width: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  /* Colonne verticale pour les images Œil Droit Situation B */
+  .sit-multi-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(2px, 0.4vw, 5px);
+  }
+  .sit-or-label {
+    font-size: clamp(9px, 0.85vw, 11px);
+    font-weight: 700;
+    color: var(--ink-mute);
+    letter-spacing: .05em;
+    text-align: center;
+    line-height: 1;
+  }
+
   .sit-eye-label {
-    font-size: clamp(11px, 1.1vw, 13px);
+    font-size: clamp(9px, 0.9vw, 12px);
     font-weight: 600;
     color: var(--ink-mute);
     white-space: nowrap;
@@ -903,8 +988,8 @@
 
   /* Taille unique pour toutes les images des situations */
   .sit-img-main {
-    width: clamp(70px, 10vw, 110px);
-    height: clamp(70px, 10vw, 110px);
+    width: clamp(50px, 8vw, 100px);
+    height: clamp(50px, 8vw, 100px);
   }
 
   .situation-img-wrap {
@@ -936,22 +1021,72 @@
     white-space: nowrap;
   }
 
-  /* "Autre chose" — même taille que les autres images */
+  /* "Autre chose" — même taille que les autres images, fond noir texte blanc */
   .situation-autre {
     border-radius: 8px;
-    background: var(--brand-blue-soft);
-    border: 1.5px dashed var(--brand-blue);
+    background: #000000;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(9px, 0.9vw, 11px);
+    font-size: clamp(12px, 1.3vw, 16px);
     font-weight: 700;
-    color: var(--brand-blue);
+    color: #ffffff;
     text-align: center;
     padding: 4px;
     box-sizing: border-box;
     flex-shrink: 0;
     line-height: 1.25;
+  }
+
+  /* ═══════════ COLUMN HEADER LABELS (question screen) ═══════════ */
+  /* Outer wrapper — same 3-col flex as sit-row--three */
+  /* Headers colonnes : même grid que sit-row--three pour alignement parfait */
+  .sit-col-headers {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: clamp(10px, 2vw, 28px);
+    width: 100%;
+    margin-top: clamp(16px, 3vh, 36px);
+    padding: 0 0 clamp(3px,0.5vh,6px) 0;
+    pointer-events: none;
+  }
+  .sit-col-header {
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-weight: 700;
+    color: var(--brand-blue);
+    text-align: center;
+    font-style: italic;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  /* Spacer : même taille que la colonne fille (sit-girl-img) */
+  .sit-col-header--spacer {
+    visibility: hidden;
+    width: clamp(60px, 12vw, 120px);
+    justify-self: center;
+  }
+  #colHeaderRight { justify-self: center; }
+  #colHeaderLeft  { justify-self: center; }
+
+  /* b correct Situation B : label en haut, image centrée verticalement */
+  .sit-eye-col--right-b {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 0;
+    align-self: stretch; /* stretch to full height of the sit-row */
+  }
+  .sit-eye-col--right-b .sit-eye-label {
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  .sit-eye-col--right-b .sit-b-img-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* ═══════════ SEND FORM (result screen) ═══════════ */
@@ -1272,20 +1407,33 @@
         <h2 class="result-title" id="questionTitleEl"></h2>
         <p class="result-subtext" id="questionSubEl"></p>
 
+        <!-- Labels colonnes globaux (au-dessus des 2 situations) -->
+        <div class="sit-col-headers" id="sitColHeaders">
+          <div class="sit-col-header" id="colHeaderRight"></div>
+          <div class="sit-col-header sit-col-header--spacer">·</div>
+          <div class="sit-col-header" id="colHeaderLeft"></div>
+        </div>
+
         <!-- Situation cards — empilées verticalement -->
         <div class="situation-stack">
 
           <!-- ── Situation A ── -->
           <button class="situation-card" id="sitCardA" onclick="answerQuestion(false)" aria-label="Situation A">
             <div class="situation-label">Situation A</div>
-            <div class="sit-row">
+            <div class="sit-row sit-row--three">
+              <!-- Œil Droit -->
+              <div class="sit-eye-col">
+                <div class="sit-eye-label" id="sitA_labelD"></div>
+                <div class="situation-img-wrap sit-img-main"><img id="sitA_right" alt="noir"></div>
+              </div>
+              <!-- Fille au centre -->
+              <div class="sit-eye-col sit-girl-col">
+                <img class="sit-girl-img" id="sitA_girl" alt="">
+              </div>
+              <!-- Œil Gauche -->
               <div class="sit-eye-col">
                 <div class="sit-eye-label" id="sitA_labelG"></div>
                 <div class="situation-img-wrap sit-img-main"><img id="sitA_left" alt="b"></div>
-              </div>
-              <div class="sit-eye-col">
-                <div class="sit-eye-label" id="sitA_labelD"></div>
-                <div class="situation-img-wrap sit-img-main"><img id="sitA_right" alt=""></div>
               </div>
             </div>
           </button>
@@ -1293,23 +1441,27 @@
           <!-- ── Situation B ── -->
           <button class="situation-card" id="sitCardB" onclick="answerQuestion(true)" aria-label="Situation B">
             <div class="situation-label">Situation B</div>
-            <div class="sit-row">
-              <!-- Œil gauche : 1 grande image -->
-              <div class="sit-eye-col">
-                <div class="sit-eye-label" id="sitB_labelG"></div>
-                <div class="situation-img-wrap sit-img-main"><img id="sitB_bflou" alt="b flou"></div>
-              </div>
-              <!-- Œil droit : label centré sur les 4 images, puis ligne -->
+            <div class="sit-row sit-row--three">
+              <!-- Œil Droit : b flou + d flou + Autre chose -->
               <div class="sit-eye-col sit-eye-col--multi">
                 <div class="sit-eye-label" id="sitB_labelD"></div>
-                <div class="sit-multi-row">
+                <div class="sit-multi-col">
                   <div class="situation-img-wrap sit-img-main"><img id="sitB_bflou2" alt="b flou"></div>
-                  <span class="situation-or">OU</span>
+                  <div class="sit-or-label" id="sitB_or1">OU</div>
                   <div class="situation-img-wrap sit-img-main"><img id="sitB_d" alt="d flou"></div>
-                  <span class="situation-or">OU</span>
-                  <div class="situation-img-wrap sit-img-main"><img id="sitB_o" alt="o flou"></div>
-                  <span class="situation-or">OU</span>
+                  <div class="sit-or-label" id="sitB_or2">OU</div>
                   <div class="situation-autre sit-img-main" id="sitB_autre">Autre<br>chose</div>
+                </div>
+              </div>
+              <!-- Fille au centre -->
+              <div class="sit-eye-col sit-girl-col">
+                <img class="sit-girl-img" id="sitB_girl" alt="">
+              </div>
+              <!-- Œil Gauche : b correct — label en haut, image centrée verticalement -->
+              <div class="sit-eye-col--right-b">
+                <div class="sit-eye-label" id="sitB_labelG"></div>
+                <div class="sit-b-img-center">
+                  <div class="situation-img-wrap sit-img-main"><img id="sitB_bflou" alt="b"></div>
                 </div>
               </div>
             </div>
@@ -1437,19 +1589,19 @@ const I18N = {
     replayLabel: "Replay sequence",
 
     // LEFT eye tested = left eye fixates the b, right hand covers right eye
-    prevLeft1: "Sit comfortably · both eyes open",
-    prevLeft2: "Close your right eye and cover it with your right hand · your left eye fixates the center of the « b » for 15 seconds",
-    prevLeft3: "Keeping your right eye closed and your right hand over it, close your left eye and place your left hand over your left eye",
+    prevLeft1: "Sit comfortably in front of your screen in a quiet environment",
+    prevLeft2: "Close your right eye and cover it with your right hand · your left eye focuses the center of the « b » for 15 seconds",
+    prevLeft3: "Remain facing the screen · Keeping your right eye closed and your right hand over it, close your left eye and cover it with your left hand",
     prevLeft4: "Keep your eyelids closed · remove your left hand for 3 seconds · What do you observe?",
-    prevLeft5: "Place your left hand back over your left eye",
+    prevLeft5: "Replace your left hand over your left eye",
     prevLeft6: "Eyelids still closed · remove your right hand for 3 seconds · What do you observe?",
-    prevLeft7: "Place your right hand back over your right eye",
+    prevLeft7: "Replace your right hand over your right eye",
     prevLeft8: "Keep your eyelids closed · remove your left hand for 3 seconds · What do you observe?",
-    prevLeft9: "Place your left hand back over your left eye",
+    prevLeft9: "Replace your left hand over your left eye",
     prevLeft10: "Eyelids still closed · remove your right hand for 3 seconds · What do you observe?",
 
     // RIGHT eye tested = right eye fixates the b, left hand covers left eye
-    prevRight1: "Sit comfortably · both eyes open",
+    /*prevRight1: "Sit comfortably · both eyes open",
     prevRight2: "Close your left eye and cover it with your left hand · your right eye fixates the center of the « b » for 15 seconds",
     prevRight3: "Keeping your left eye closed and your left hand over it, close your right eye and place your right hand over your right eye",
     prevRight4: "Keep your eyelids closed · remove your right hand for 3 seconds · What do you observe?",
@@ -1458,7 +1610,7 @@ const I18N = {
     prevRight7: "Place your left hand back over your left eye",
     prevRight8: "Keep your eyelids closed · remove your right hand for 3 seconds · What do you observe?",
     prevRight9: "Place your right hand back over your right eye",
-    prevRight10: "Eyelids still closed · remove your left hand for 3 seconds · What do you observe?",
+    prevRight10: "Eyelids still closed · remove your left hand for 3 seconds · What do you observe?",*/
 
     testFixate: "Fixate the « b »",
     btnEndTest: "End test",
@@ -1467,6 +1619,8 @@ const I18N = {
     questionEyebrow: "Your result",
     questionTitle: "What did you observe?",
     questionSubtext: "Among these 2 situations, which best matches what you observed?",
+    colHeaderRight: "What did you observe?",
+    colHeaderLeft: "You observed.",
     resultCrowdingEyebrow: "Crowding detected",
     resultCrowdingTitle: "You have neurovisual crowding!",
     resultCrowdingText: "Lexilens technology can help with your daily reading by reducing internal crowding.",
@@ -1533,28 +1687,28 @@ const I18N = {
     replayLabel: "Revoir la séquence",
 
     // Œil GAUCHE testé = œil gauche fixe le b, main droite couvre œil droit
-    prevLeft1: "Installez-vous confortablement · les 2 yeux ouverts",
-    prevLeft2: "Fermez votre œil droit et couvrez votre œil droit avec votre main droite · votre œil gauche fixe le centre du « b » pendant 15 secondes",
-    prevLeft3: "En gardant votre œil droit fermé et votre main droite sur votre œil droit, fermez votre œil gauche et placez votre main gauche sur votre œil gauche",
+    prevLeft1: "Installez-vous confortablement face à votre écran, au calme",
+    prevLeft2: "Fermez votre œil droit et couvrez-le avec votre main droite · votre œil gauche fixe le centre du « b » pendant 15 secondes",
+    prevLeft3: "Restez face à l’écran. En gardant votre œil droit fermé et votre main sur votre œil, fermez votre œil gauche et couvrez-le avec votre main gauche",
     prevLeft4: "Gardez les paupières fermées · retirez votre main gauche pendant 3 secondes · Qu'observez-vous ?",
     prevLeft5: "Replacez votre main gauche sur votre œil gauche",
-    prevLeft6: "Paupières toujours fermées · retirez la main droite pendant 3 secondes · Qu'observez-vous ?",
+    prevLeft6: "Paupières toujours fermées · retirez votre main droite pendant 3 secondes · Qu'observez-vous ?",
     prevLeft7: "Replacez votre main droite sur votre œil droit",
-    prevLeft8: "Gardez les paupières fermées · retirez votre main gauche pendant 3 secondes · Qu'observez-vous ?",
+    prevLeft8: "Paupières toujours fermées · retirez votre main gauche pendant 3 secondes · Qu'observez-vous ?",
     prevLeft9: "Replacez votre main gauche sur votre œil gauche",
-    prevLeft10: "Paupières toujours fermées · retirez la main droite pendant 3 secondes · Qu'observez-vous ?",
+    prevLeft10: "Paupières toujours fermées · retirez votre main droite pendant 3 secondes · Qu'observez-vous ?",
 
     // Œil DROIT testé = œil droit fixe le b, main gauche couvre œil gauche
-    prevRight1: "Installez-vous confortablement · les 2 yeux ouverts",
+    /*prevRight1: "Installez-vous confortablement face à votre écran, au calme",
     prevRight2: "Fermez votre œil gauche et couvrez votre œil gauche avec votre main gauche · votre œil droit fixe le centre du « b » pendant 15 secondes",
-    prevRight3: "En gardant votre œil gauche fermé et votre main gauche sur votre œil gauche, fermez votre œil droit et placez votre main droite sur votre œil droit",
+    prevRight3: "Restez face à l’écran. En gardant votre œil droit fermé et votre main sur votre œil, fermez votre œil gauche et couvrez-le avec votre main gauche",
     prevRight4: "Gardez les paupières fermées · retirez votre main droite pendant 3 secondes · Qu'observez-vous ?",
     prevRight5: "Replacez votre main droite sur votre œil droit",
     prevRight6: "Paupières toujours fermées · retirez la main gauche pendant 3 secondes · Qu'observez-vous ?",
     prevRight7: "Replacez votre main gauche sur votre œil gauche",
     prevRight8: "Gardez les paupières fermées · retirez votre main droite pendant 3 secondes · Qu'observez-vous ?",
     prevRight9: "Replacez votre main droite sur votre œil droit",
-    prevRight10: "Paupières toujours fermées · retirez la main gauche pendant 3 secondes · Qu'observez-vous ?",
+    prevRight10: "Paupières toujours fermées · retirez la main gauche pendant 3 secondes · Qu'observez-vous ?",*/
 
     testFixate: "Fixez le « b »",
     btnEndTest: "Test terminé",
@@ -1563,9 +1717,11 @@ const I18N = {
     questionEyebrow: "Votre résultat",
     questionTitle: "Qu'avez-vous observé ?",
     questionSubtext: "Parmi ces 2 situations, quelle situation ressemble le plus à ce que vous avez observé ?",
+    colHeaderRight: "Qu'avez-vous observé ?",
+    colHeaderLeft: "Vous avez observé.",
     resultCrowdingEyebrow: "Encombrement détecté",
     resultCrowdingTitle: "Vous avez de l'encombrement neurovisuel !",
-    resultCrowdingText: "La technologie Lexilens peut vous aider dans votre lecture quotidienne en réduisant l'encombrement interne.",
+    resultCrowdingText: "La technologie Lexilens peut vous aider dans votre lecture quotidienne en supprimant l'encombrement interne.",
     resultNoCrowdingEyebrow: "Pas d'encombrement",
     resultNoCrowdingTitle: "Pas d'encombrement neurovisuel !",
     resultNoCrowdingText: "",
@@ -2125,21 +2281,26 @@ async function startTest() {
   await playStepAudioAndWait(10); // index 10 = step03bis
   if (!state.testRunning) return;
 
-  // Cacher le b seulement maintenant (après step03bis)
-  hideLetter();
+  // Le b reste affiché pendant toute la suite (ne pas appeler hideLetter ici)
 
   // ─── Afficher le bouton "Test terminé" après 7s (en parallèle) ───
   wait(7000).then(() => {
     if (!state.testRunning) return;
     state.endTestArmed = true;
     endTestBar.classList.add('show');
+    // Le b reste affiché même quand endTestBar apparaît
   });
 
   // ─── VOIX OFF des étapes 4 à 10 (index 3 à 9) ───
-  // step03 a déjà été joué via step03bis ci-dessus
+  // Après step04, 06, 08, 10 (index 3, 5, 7, 9) : attendre 2 secondes supplémentaires
+  const stepsWithDelay = new Set([3, 5, 7, 9]); // step04, step06, step08, step10
   for (let i = 3; i <= 9; i++) {
     if (!state.testRunning) return;
     await playStepAudioAndWait(i); // step04 → step10
+    if (stepsWithDelay.has(i)) {
+      await wait(2000); // 2 secondes de pause après step04, 06, 08, 10
+    }
+    if (!state.testRunning) return;
   }
 }
 
@@ -2191,23 +2352,40 @@ function showQuestionScreen() {
     if (el) el.textContent = labelD;
   });
 
-  // Images Situation A : b flou blanc (gauche) + noir rien (droite)
+  // Images Situation A : noir (droite/Œil Droit) + b correct (gauche/Œil Gauche)
   const sitA_left = document.getElementById('sitA_left');
   if (sitA_left) sitA_left.src = IMG.img_sitA_left;
   const sitA_right = document.getElementById('sitA_right');
   if (sitA_right) sitA_right.src = IMG.img_sitA_right;
 
+  // Fille pos5 pour les deux situations
+  const sitA_girl = document.getElementById('sitA_girl');
+  if (sitA_girl) sitA_girl.src = IMG.pos5;
+  const sitB_girl = document.getElementById('sitB_girl');
+  if (sitB_girl) sitB_girl.src = IMG.pos5;
+
   // Images Situation B
   // Œil gauche : grand b (référence, même que Situation A gauche)
   const sitB_bflou = document.getElementById('sitB_bflou');
   if (sitB_bflou) sitB_bflou.src = IMG.img_sitA_left;
-  // Œil droit : b flou + d + o + autre chose
+  // Œil droit : b flou + d flou (sans o)
   const sitB_bflou2 = document.getElementById('sitB_bflou2');
   if (sitB_bflou2) sitB_bflou2.src = IMG.img_sitB_bflou;
   const sitB_d = document.getElementById('sitB_d');
   if (sitB_d) sitB_d.src = IMG.img_sitB_d;
-  const sitB_o = document.getElementById('sitB_o');
-  if (sitB_o) sitB_o.src = IMG.img_sitB_o;
+
+  // Labels colonnes globaux
+  const colRight = document.getElementById('colHeaderRight');
+  if (colRight) colRight.textContent = t.colHeaderRight;
+  const colLeft = document.getElementById('colHeaderLeft');
+  if (colLeft) colLeft.textContent = t.colHeaderLeft;
+
+  // Labels "OU/OR" bilingues
+  const orLabel = state.lang === 'fr' ? 'OU' : 'OR';
+  ['sitB_or1','sitB_or2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = orLabel;
+  });
 
   // Label "Autre chose" bilingue
   const sitB_autre = document.getElementById('sitB_autre');
