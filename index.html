@@ -1936,6 +1936,7 @@ const AUDIO_STEPS = {
     'step08_fr.mp3',
     'step09_fr.mp3',
     'step10_fr.mp3',
+	'step11_fr.mp3',
     'step03bis_fr.mp3', // index 10 : même texte que step03 mais pour le test réel
   ],
   en: [
@@ -1949,6 +1950,7 @@ const AUDIO_STEPS = {
     'step08_en.mp3',
     'step09_en.mp3',
     'step10_en.mp3',
+	'step11_en.mp3',
     'step03bis_en.mp3', // index 10 : test réel
   ]
 };
@@ -2361,18 +2363,10 @@ async function startTest() {
   if (!state.testRunning) return;
 
   // ─── Le b reste affiché — on joue step03bis pendant que l'utilisateur voit encore le b ───
-  await playStepAudioAndWait(10); // index 10 = step03bis
+  await playStepAudioAndWait(11); // index 11 = step03bis
   if (!state.testRunning) return;
 
   // Le b reste affiché pendant toute la suite (ne pas appeler hideLetter ici)
-
-  // ─── Afficher le bouton "Test terminé" après 7s (en parallèle) ───
-  wait(7000).then(() => {
-    if (!state.testRunning) return;
-    state.endTestArmed = true;
-    endTestBar.classList.add('show');
-    // Le b reste affiché même quand endTestBar apparaît
-  });
 
   // ─── VOIX OFF des étapes 4 à 10 (index 3 à 9) ───
   // Après step04, 06, 08, 10 (index 3, 5, 7, 9) : attendre 2 secondes supplémentaires
@@ -2385,7 +2379,17 @@ async function startTest() {
     }
     if (!state.testRunning) return;
   }
-}
+
+	// ─── DÉMARRAGE STEP11 ───
+	// Afficher le bouton exactement au démarrage de la voix step11
+	state.endTestArmed = true;
+	endTestBar.classList.add('show');
+
+	// Lecture de step11
+	await playStepAudioAndWait(10); // index 10 = step11
+
+	if (!state.testRunning) return;
+	}
 
 function finishTest() {
   state.testRunning = false;
