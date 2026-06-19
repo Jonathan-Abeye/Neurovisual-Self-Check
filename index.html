@@ -1953,29 +1953,42 @@ const AUDIO_STEPS = {
   ]
 };
 
-let currentAudio = null; // HTMLAudioElement en cours
-const audioCache = {}; // Cache des Audio préchargés pendant le geste utilisateur
+// ── Élément <audio> HTML unique réutilisé — débloqué une fois au 1er geste (fix iOS) ──
+let sharedAudio = null;
+let currentAudio = null;
 
-// Précharge tous les MP3 du test pendant un geste utilisateur (tap Start)
-// Cela contourne la restriction mobile qui bloque audio.play() hors geste
+function getSharedAudio() {
+  if (!sharedAudio) {
+    sharedAudio = document.createElement('audio');
+    sharedAudio.preload = 'auto';
+    document.body.appendChild(sharedAudio);
+  }
+  return sharedAudio;
+}
+
+// Appeler lors du 1er geste utilisateur pour débloquer l'audio sur iOS
+function unlockAudio() {
+  const a = getSharedAudio();
+  // Jouer un silence pour débloquer l'élément audio sur iOS
+  a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  a.play().catch(() => {});
+  a.pause();
+  a.currentTime = 0;
+}
+
+// Précharge les fichiers (optionnel, pour réduire la latence)
 function preloadTestAudio() {
-  const files = AUDIO_STEPS[state.lang] || [];
-  files.forEach((file, i) => {
-    if (!file) return;
-    const a = new Audio(AUDIO_BASE + file);
-    a.preload = 'auto';
-    // Sur iOS, il faut "toucher" l'audio pendant le geste pour le débloquer
-    a.load();
-    audioCache[state.lang + '_' + i] = a;
-  });
+  unlockAudio(); // Débloquer l'audio au moment du geste "Start test"
 }
 
 function stopAudio() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
+  const a = getSharedAudio();
+  a.onplay  = null;
+  a.onended = null;
+  a.onerror = null;
+  a.pause();
+  a.currentTime = 0;
+  currentAudio = null;
   window.speechSynthesis && window.speechSynthesis.cancel();
   document.getElementById('audioBtn').classList.remove('speaking');
 }
@@ -1983,15 +1996,15 @@ function stopAudio() {
 // Joue un MP3 par index (0-based) — sans attendre la fin (pour preview)
 function playStepAudio(stepIndex) {
   if (!state.audioEnabled) return;
-  stopAudio();
   const file = AUDIO_STEPS[state.lang]?.[stepIndex];
   if (!file) return;
-  const audio = new Audio(AUDIO_BASE + file);
-  currentAudio = audio;
-  audio.onplay  = () => document.getElementById('audioBtn').classList.add('speaking');
-  audio.onended = () => { document.getElementById('audioBtn').classList.remove('speaking'); currentAudio = null; };
-  audio.onerror = () => { document.getElementById('audioBtn').classList.remove('speaking'); currentAudio = null; };
-  audio.play().catch(() => {});
+  const a = getSharedAudio();
+  stopAudio();
+  a.src = AUDIO_BASE + file;
+  a.onplay  = () => document.getElementById('audioBtn').classList.add('speaking');
+  a.onended = () => { document.getElementById('audioBtn').classList.remove('speaking'); };
+  a.onerror = () => { document.getElementById('audioBtn').classList.remove('speaking'); };
+  a.play().catch(() => {});
 }
 
 // Joue un MP3 par index et retourne une Promise résolue à la fin (pour le test)
@@ -2000,37 +2013,26 @@ function playStepAudioAndWait(stepIndex) {
     if (!state.audioEnabled) { resolve(); return; }
     const file = AUDIO_STEPS[state.lang]?.[stepIndex];
     if (!file) { resolve(); return; }
+
+    const a = getSharedAudio();
     stopAudio();
+    a.src = AUDIO_BASE + file;
 
-    // Utiliser le cache préchargé pendant le geste utilisateur (fix mobile)
-    const cacheKey = state.lang + '_' + stepIndex;
-    let audio = audioCache[cacheKey];
-    if (audio) {
-      // Réinitialiser pour rejouer depuis le début
-      audio.currentTime = 0;
-    } else {
-      // Fallback si pas en cache
-      audio = new Audio(AUDIO_BASE + file);
-    }
-
-    currentAudio = audio;
-    audio.onplay  = () => document.getElementById('audioBtn').classList.add('speaking');
-    audio.onended = () => {
+    a.onplay  = () => document.getElementById('audioBtn').classList.add('speaking');
+    a.onended = () => {
       document.getElementById('audioBtn').classList.remove('speaking');
-      currentAudio = null;
       resolve();
     };
-    audio.onerror = () => {
+    a.onerror = () => {
       document.getElementById('audioBtn').classList.remove('speaking');
-      currentAudio = null;
+      // Fallback synthèse vocale si MP3 absent/bloqué
       const texts = T().audioSteps;
       if (texts?.[stepIndex]) speakAndWaitSynth(texts[stepIndex]).then(resolve);
       else resolve();
     };
-    audio.play().catch(err => {
-      // Sur mobile : si bloqué, fallback synthèse vocale
-      console.warn('Audio play blocked:', err);
-      currentAudio = null;
+    a.play().catch(err => {
+      console.warn('Audio blocked:', err);
+      // Fallback synthèse vocale
       const texts = T().audioSteps;
       if (texts?.[stepIndex]) speakAndWaitSynth(texts[stepIndex]).then(resolve);
       else resolve();
