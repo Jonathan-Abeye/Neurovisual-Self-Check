@@ -1954,6 +1954,21 @@ const AUDIO_STEPS = {
 };
 
 let currentAudio = null; // HTMLAudioElement en cours
+const audioCache = {}; // Cache des Audio préchargés pendant le geste utilisateur
+
+// Précharge tous les MP3 du test pendant un geste utilisateur (tap Start)
+// Cela contourne la restriction mobile qui bloque audio.play() hors geste
+function preloadTestAudio() {
+  const files = AUDIO_STEPS[state.lang] || [];
+  files.forEach((file, i) => {
+    if (!file) return;
+    const a = new Audio(AUDIO_BASE + file);
+    a.preload = 'auto';
+    // Sur iOS, il faut "toucher" l'audio pendant le geste pour le débloquer
+    a.load();
+    audioCache[state.lang + '_' + i] = a;
+  });
+}
 
 function stopAudio() {
   if (currentAudio) {
@@ -1986,7 +2001,18 @@ function playStepAudioAndWait(stepIndex) {
     const file = AUDIO_STEPS[state.lang]?.[stepIndex];
     if (!file) { resolve(); return; }
     stopAudio();
-    const audio = new Audio(AUDIO_BASE + file);
+
+    // Utiliser le cache préchargé pendant le geste utilisateur (fix mobile)
+    const cacheKey = state.lang + '_' + stepIndex;
+    let audio = audioCache[cacheKey];
+    if (audio) {
+      // Réinitialiser pour rejouer depuis le début
+      audio.currentTime = 0;
+    } else {
+      // Fallback si pas en cache
+      audio = new Audio(AUDIO_BASE + file);
+    }
+
     currentAudio = audio;
     audio.onplay  = () => document.getElementById('audioBtn').classList.add('speaking');
     audio.onended = () => {
@@ -1995,14 +2021,20 @@ function playStepAudioAndWait(stepIndex) {
       resolve();
     };
     audio.onerror = () => {
-      // Fallback synthèse si MP3 absent
       document.getElementById('audioBtn').classList.remove('speaking');
       currentAudio = null;
       const texts = T().audioSteps;
       if (texts?.[stepIndex]) speakAndWaitSynth(texts[stepIndex]).then(resolve);
       else resolve();
     };
-    audio.play().catch(() => { resolve(); });
+    audio.play().catch(err => {
+      // Sur mobile : si bloqué, fallback synthèse vocale
+      console.warn('Audio play blocked:', err);
+      currentAudio = null;
+      const texts = T().audioSteps;
+      if (texts?.[stepIndex]) speakAndWaitSynth(texts[stepIndex]).then(resolve);
+      else resolve();
+    });
   });
 }
 
@@ -2114,7 +2146,10 @@ function goTo(name) {
     buildPreviewSteps();
     startPreview();
   }
-  if (name === 'test') startTest();
+  if (name === 'test') {
+    preloadTestAudio(); // Précharge pendant le geste utilisateur (fix mobile)
+    startTest();
+  }
 }
 
 /* ═══════════════════════════════════════════════════
