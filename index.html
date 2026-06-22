@@ -25,8 +25,8 @@
     --brand-blue-soft: #e8f0fa;
 
     /* Accent (orange/gold from site) */
-    --accent: #F5A623;
-    --accent-light: #ffc14d;
+    --accent: #ffbd2C;
+    --accent-light: #ffbd2C;
 
     /* Text */
     --ink-dark: #0d1f35;
@@ -425,9 +425,10 @@
     border: 1px solid var(--brand-blue-soft);
   }
   .prereq:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--brand-blue);
+	
+    //transform: translateY(-2px);
+    //box-shadow: var(--shadow-md);
+    //border-color: var(--brand-blue);
   }
   .prereq-icon {
     font-size: clamp(20px, 2vw, 28px);
@@ -496,9 +497,9 @@
     transition: all 250ms var(--ease);
   }
   .guidelines-list li:hover {
-    border-color: var(--brand-blue);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    //border-color: var(--brand-blue);
+    //transform: translateY(-1px);
+    //box-shadow: var(--shadow-md);
   }
   .guidelines-list li::before {
     content: "✓";
@@ -1182,6 +1183,17 @@
     line-height: 1.5;
     max-width: 320px;
   }
+  .rgpd-notice {
+    font-size: clamp(10px, 0.85vw, 12px);
+    color: var(--ink-mute);
+    line-height: 1.4;
+    margin: 2px 0 4px;
+    text-align: center;
+  }
+  .rgpd-notice a {
+    color: var(--brand-blue);
+    text-decoration: underline;
+  }
   .send-error-msg {
     font-size: 13px;
     color: var(--warning);
@@ -1536,6 +1548,7 @@
             <label class="field-label" id="labelEmail"></label>
             <input type="email" id="sendEmail" class="field-input" autocomplete="email">
           </div>
+          <p class="rgpd-notice" id="rgpdNotice"></p>
           <div class="send-error-msg" id="sendErrorMsg"></div>
           <button class="btn-send" id="btnSend" onclick="submitForm()">
             <span id="btnSendLabel"></span>
@@ -1634,7 +1647,7 @@ const I18N = {
 
     // LEFT eye tested = left eye fixates the b, right hand covers right eye
     prevLeft1: "Sit comfortably in front of your screen in a quiet environment",
-    prevLeft2: "Close your right eye and cover it with your right hand · your left eye focuses the center of the « b » for 15 seconds",
+    prevLeft2: "Close your right eye and cover it with your right hand · your left eye focuses on the center of the « b » for 15 seconds",
     prevLeft3: "Remain facing the screen · Keeping your right eye closed and your right hand over it, close your left eye and cover it with your left hand",
     prevLeft4: "Keep your eyelids closed · remove your left hand for 3 seconds · What do you observe?",
     prevLeft5: "Replace your left hand over your left eye",
@@ -1669,7 +1682,7 @@ const I18N = {
     resultCrowdingTitle: "You have neurovisual crowding!",
     resultCrowdingText: "Lexilens technology can help with your daily reading by reducing internal crowding.",
     resultNoCrowdingEyebrow: "No crowding detected",
-    resultNoCrowdingTitle: "No neurovisual crowding!",
+    resultNoCrowdingTitle: "You don't have neurovisual crowding!",
     resultNoCrowdingText: "",
     labelPrenom: "First name",
     labelEmail: "Email address",
@@ -1684,6 +1697,7 @@ const I18N = {
     btnFinish2: "Back to home",
     errorRequired: "Please fill in all fields.",
     errorEmail: "Please enter a valid email address.",
+    rgpdNotice: 'Your data is used solely to send your results. Learn more: <a href="https://www.lexilens.com" target="_blank">www.lexilens.com</a>',
     errorSend: "An error occurred. Please try again.",
 
     audioOn: "🔊 Voice enabled",
@@ -1693,7 +1707,7 @@ const I18N = {
   fr: {
     welcomeEyebrow: "",
     welcomeTitle: "Auto-test <em>Neurovisuel</em>",
-    welcomeLead: "Un test simple de 2 minutes, sans matériel, pour révéler un éventuel crowding neurovisuel interne.",
+    welcomeLead: "Un test simple de 2 minutes, sans matériel, pour révéler un éventuel encombrement neurovisuel interne.",
     prereqGlasses: "Gardez vos lunettes",
     prereqGlassesSub: "Portez-les comme d'habitude",
     prereqCalm: "Environnement calme",
@@ -1708,10 +1722,10 @@ const I18N = {
     guidelinesEyebrow: "",
     guidelinesTitle: "Quelques <em>consignes</em>",
     g1: "Restez calme et respirez normalement",
-    g2: "Fixez le countdown — ne bougez pas votre œil",
+    g2: "Fixez le centre du 'b' — ne bougez pas votre œil",
     g3: "Fermez les yeux doucement — sans serrer",
-    g4: "Si vous êtes dérangé, recommencez le test",
-    g5: "Vous pouvez refaire le test autant que vous voulez",
+    g4: "Si vous êtes dérangé(e), recommencez le test",
+    g5: "Vous pouvez refaire le test autant de fois que vous voulez",
     g6: "Apprenez la séquence à l'écran suivant avant de commencer",
     btnLearnSteps: "Continuer",
 
@@ -1766,8 +1780,8 @@ const I18N = {
     resultCrowdingEyebrow: "Encombrement détecté",
     resultCrowdingTitle: "Vous avez de l'encombrement neurovisuel !",
     resultCrowdingText: "La technologie Lexilens peut vous aider dans votre lecture quotidienne en supprimant l'encombrement interne.",
-    resultNoCrowdingEyebrow: "Pas d'encombrement",
-    resultNoCrowdingTitle: "Pas d'encombrement neurovisuel !",
+    resultNoCrowdingEyebrow: "Pas d'encombrement détecté",
+    resultNoCrowdingTitle: "Vous n'avez pas d'encombrement neurovisuel !",
     resultNoCrowdingText: "",
     labelPrenom: "Prénom",
     labelEmail: "Adresse e-mail",
@@ -1782,6 +1796,7 @@ const I18N = {
     btnFinish2: "Retour à l'accueil",
     errorRequired: "Veuillez renseigner tous les champs.",
     errorEmail: "Veuillez entrer une adresse e-mail valide.",
+    rgpdNotice: "Vos données sont utilisées uniquement pour l'envoi de vos résultats. En savoir plus : <a href='https://www.lexilens.com' target='_blank'>www.lexilens.com</a>",
     errorSend: "Une erreur s'est produite. Veuillez réessayer.",
 
     audioOn: "🔊 Voix activée",
@@ -2509,6 +2524,8 @@ function showResultScreen() {
   if (el_lp) el_lp.textContent = t.labelPrenom;
   const el_le = document.getElementById('labelEmail');
   if (el_le) el_le.textContent = t.labelEmail;
+  const el_rgpd = document.getElementById('rgpdNotice');
+  if (el_rgpd) el_rgpd.innerHTML = t.rgpdNotice;
   const el_sp = document.getElementById('sendPrenom');
   if (el_sp) el_sp.placeholder = t.placeholderPrenom;
   const el_se = document.getElementById('sendEmail');
