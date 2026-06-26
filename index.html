@@ -1183,16 +1183,34 @@
     line-height: 1.5;
     max-width: 320px;
   }
-  .rgpd-notice {
+  .rgpd-checkbox-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    margin: 2px 0 4px;
+    text-align: left;
+  }
+  .rgpd-checkbox-wrap input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    margin-top: 2px;
+    accent-color: var(--brand-blue);
+    cursor: pointer;
+  }
+  .rgpd-checkbox-text {
     font-size: clamp(10px, 0.85vw, 12px);
     color: var(--ink-mute);
     line-height: 1.4;
-    margin: 2px 0 4px;
-    text-align: center;
   }
-  .rgpd-notice a {
+  .rgpd-checkbox-text a {
     color: var(--brand-blue);
     text-decoration: underline;
+  }
+  /* Bordure rouge si case non cochée et tentative d'envoi */
+  .rgpd-checkbox-wrap.error .rgpd-checkbox-text {
+    color: var(--warning, #c0392b);
   }
   .send-error-msg {
     font-size: 13px;
@@ -1548,7 +1566,10 @@
             <label class="field-label" id="labelEmail"></label>
             <input type="email" id="sendEmail" class="field-input" autocomplete="email">
           </div>
-          <p class="rgpd-notice" id="rgpdNotice"></p>
+          <label class="rgpd-checkbox-wrap" id="rgpdWrap">
+            <input type="checkbox" id="rgpdCheck">
+            <span class="rgpd-checkbox-text" id="rgpdText"></span>
+          </label>
           <div class="send-error-msg" id="sendErrorMsg"></div>
           <button class="btn-send" id="btnSend" onclick="submitForm()">
             <span id="btnSendLabel"></span>
@@ -1697,7 +1718,8 @@ const I18N = {
     btnFinish2: "Back to home",
     errorRequired: "Please fill in all fields.",
     errorEmail: "Please enter a valid email address.",
-    rgpdNotice: 'Your data is used solely to send your results. Learn more: <a href="https://www.lexilens.com" target="_blank">www.lexilens.com</a>',
+    rgpdNotice: "I acknowledge that my personal information will be processed in accordance with the <a href='https://www.lexilens.com/pages/privacy-policy' target='_blank'>Privacy Policy</a>.",
+    errorRgpd: "Please accept the Privacy Policy to continue.",
     errorSend: "An error occurred. Please try again.",
 
     audioOn: "🔊 Voice enabled",
@@ -1796,7 +1818,8 @@ const I18N = {
     btnFinish2: "Retour à l'accueil",
     errorRequired: "Veuillez renseigner tous les champs.",
     errorEmail: "Veuillez entrer une adresse e-mail valide.",
-    rgpdNotice: "Vos données sont utilisées uniquement pour l'envoi de vos résultats. En savoir plus : <a href='https://www.lexilens.com' target='_blank'>www.lexilens.com</a>",
+    rgpdNotice: "J'ai pris connaissance de la <a href='https://www.lexilens.com/pages/privacy-policy' target='_blank'>Politique de confidentialité</a> et j'accepte que mes données personnelles soient utilisées pour l'envoi des résultats de mon test.",
+    errorRgpd: "Veuillez accepter la Politique de confidentialité pour continuer.",
     errorSend: "Une erreur s'est produite. Veuillez réessayer.",
 
     audioOn: "🔊 Voix activée",
@@ -2524,8 +2547,13 @@ function showResultScreen() {
   if (el_lp) el_lp.textContent = t.labelPrenom;
   const el_le = document.getElementById('labelEmail');
   if (el_le) el_le.textContent = t.labelEmail;
-  const el_rgpd = document.getElementById('rgpdNotice');
+  const el_rgpd = document.getElementById('rgpdText');
   if (el_rgpd) el_rgpd.innerHTML = t.rgpdNotice;
+  // Réinitialiser la case à chaque affichage du résultat
+  const rgpdCheck = document.getElementById('rgpdCheck');
+  if (rgpdCheck) rgpdCheck.checked = false;
+  const rgpdWrap = document.getElementById('rgpdWrap');
+  if (rgpdWrap) rgpdWrap.classList.remove('error');
   const el_sp = document.getElementById('sendPrenom');
   if (el_sp) el_sp.placeholder = t.placeholderPrenom;
   const el_se = document.getElementById('sendEmail');
@@ -2595,6 +2623,10 @@ async function submitForm() {
   document.getElementById('sendPrenom').classList.remove('error');
   document.getElementById('sendEmail').classList.remove('error');
 
+  const rgpdCheck = document.getElementById('rgpdCheck');
+  const rgpdWrap  = document.getElementById('rgpdWrap');
+  if (rgpdWrap) rgpdWrap.classList.remove('error');
+
   // Validation
   if (!prenom || !email) {
     errEl.textContent = t.errorRequired;
@@ -2608,6 +2640,12 @@ async function submitForm() {
     errEl.textContent = t.errorEmail;
     errEl.classList.add('show');
     document.getElementById('sendEmail').classList.add('error');
+    return;
+  }
+  if (!rgpdCheck || !rgpdCheck.checked) {
+    if (rgpdWrap) rgpdWrap.classList.add('error');
+    errEl.textContent = t.errorRgpd;
+    errEl.classList.add('show');
     return;
   }
 
